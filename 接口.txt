@@ -229,7 +229,7 @@
 		null
 9. 审核题目
 	URL:
-		http://127.0.0.1:8888/exam/manager/checkSubjectparams 
+		http://127.0.0.1:8888/exam/manager/checkSubject
 		subject.id			要审核的题目id
 		subject.checkState	审核是否通过  "通过"/"不通过"
 	return
@@ -262,14 +262,21 @@
 		}
 	return
 		null
-13. 根据试卷ID查找试卷
+13. 根据关键字查询试卷
+	URL:
+		http://127.0.0.1:8888/exam/manager/querysubject
+	params 
+		subject.stem
+	return
+
+14. 根据试卷ID查找试卷
 	URL:
 		http://127.0.0.1:8888/exam/manager/getExamPaperById
 	params 
 		paper.id
 	return
 	
-14. 查询所有试卷信息
+15. 查询所有试卷信息
 	URL:
 		http://127.0.0.1:8888/exam/manager/getAllExamPapers
 	params 

@@ -46,7 +46,8 @@ route.get('/getDepartmentTopics',(req,resp)=>{
 })
 //6保存题目信息
 route.post('/saveSubject',(req,resp)=>{
-    DB.saveSubject(req.body.subject).then((data)=>{
+    console.log(req.body);
+    DB.saveSubject(req.body).then((data)=>{
         resp.send(data);
     }).catch((err)=>{
         resp.send(err);
@@ -102,6 +103,14 @@ route.post('/saveStudent',(req,resp)=>{
         resp.send(err);
     })
 })
-
+//13关键字查询题目
+route.get('/querysubject/:keys',(req,resp)=>{
+    console.log("哈哈",req.params.keys)
+    DB.querysubject(req.params.keys).then((data)=>{
+        resp.send(data);
+    }).catch((err)=>{
+        resp.send(err);
+    })
+})
 
 module.exports = route;

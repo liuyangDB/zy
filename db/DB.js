@@ -29,18 +29,25 @@ module.exports={
     },
     //６保存题目信息
     saveSubject(subject){
+        console.log(subject);
+        let time = new Date();
+        let year = time.getFullYear();
+        let month = time.getMonth()+1;
+        let date = time.getDate();
+        time = year+'-'+month+'-'+date;
+        console.log(time);
         let sql = "insert into tbl_exam_subject values(null,'"
-        +subject.id+"','"
-        +subject.analysis+"'.'"
-        +subject.answer+"','"
-        +subject.checkState+"','"
-        +subject.stem+"','"
-        +subject.uploadtime+"','"
-        +subject.department.id+"','"
-        +subject.subjectLevel.id+"','"
-        +subject.subjectType.id+"','"
-        +topic.id+"','"
-        +user.id+"')";
+        +subject['analysis']+"','"
+        +subject['answer']+"','"
+        +'未通过'+"','"
+        +subject['stem']+"','"
+        +time+"',"
+        +subject['department.id']+","
+        +subject['subjectLevel.id']+","
+        +subject['subjectType.id']+","
+        +subject['topic.id']+","
+        +null+")";
+        console.log("哈哈",sql)
         return pool.execute(sql);
     },
     //７查询所有题目信息
@@ -91,7 +98,9 @@ module.exports={
     },
     //13关键字查询题目
     querysubject(keys){
+        console.log("嘻嘻",keys);
         let sql = "select * from tbl_exam_subject where stem like '%"+keys+"%'";
+        console.log(sql);
         return pool.execute(sql);
     }
     
