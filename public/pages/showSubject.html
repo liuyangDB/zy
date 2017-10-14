@@ -3,7 +3,7 @@
                 	<div class="c_editview">
                    	<div class="c_condition" style="height:50px">
                        <span><select><option>题干</option></select></span>
-                       <span class="pl5 " ><input type="text"></span>
+                       <span class="pl5 " ><input type="text" ></span>
                        <span class="pl15 pr15 btn_gray ">查找</span>
                        <span class="icon_lead-in"><em class="icon_r">批量导入题目</em></span>
                        <span class="icon_add"><em class="icon_r">单个添加题目</em></span>
@@ -113,17 +113,10 @@
 					})	
 				})	
 			})
-		
-		
-			 
-	
-			
-			
-		
 	
 		//点击单个添加题目，跳进去添加题目的界面
 		$(".c_condition .icon_add").click(function(){
-			$(".right").load("pages/添加题目.html");
+			$(".right").load("pages/addSubject.html");
 		})
 
 
@@ -159,12 +152,9 @@
 				$.post('exam/manager/getAllSubjects',param,function(data){
 					showDate(data);
 				})
-			})
-
-
-
-
 			
+			})
+		
 		//点击显示和隐藏，对应的答案和解析隐藏和出现
 		$(".Catalogtitle").find("input:checkbox").change(function(){
 				if($(this).prop("checked")){
@@ -172,9 +162,9 @@
 					}else{
 						$(".append").hide()
 					}		
-			})
-			
+			})			
 		//审核通过 审核不通过 删除题目
+		$('.Catalog_right').on('click','a');
 		$('.Catalog_right').on('click','a',function(){
 			switch($(this).text()){
 				case '审核通过':
@@ -192,140 +182,88 @@
 				$(this).css('display','none').prev().css('display','none');
 				break;
 				case '删除':
-				$.post('exam/manager/checkSubject',{
-					'subject.id':$(this).attr('id')					
+				$.post('exam/manager/delSubject',{
+					'subject.id':$(this).attr('id'),					
 				})
 				break;
 			}
 		})
+		//通过关键字查询题目
+		$('.c_condition span.btn_gray').off();
+		$('.c_condition span.btn_gray').on('click',function(){
+			let keys = $('.c_condition span:eq(1) input').val();
+			$.getJSON('exam/manager/querysubject/'+keys,function(data){
+				showDate(data);
+			})
+		})
 	 })
 	 function showDate(data){
-		  console.log(data);
+		//   console.log("1",data);
 		//   console.log(data.length);
 			//修改标题显示的题目数
 			  $(".Catalogtitle").find("em").html(data.length);
 			//将页面清空
 			$(".Catalog_rightnei:not(:hidden)").remove();	
 			//遍历后台拿到的数据
-			data.forEach(function(item,index){
+			data.forEach(function(item,index){//item每一道题目
 				// console.log(item);
 			//克隆原来隐藏的题目信息
 				var div = $(".Catalog_rightnei:hidden").clone();
 			//移除隐藏
 				div.removeAttr("hidden");
-			//让原来的div显示出来
-				$(".Catalog_right").append(div);
 			//处理Catalogtitwo中的内容
 				div.find(".Catalogtitwo").html("题号："
-				+item.id+"&nbsp;&nbsp;题型："
-				+item.subjectType_id+"&nbsp;&nbsp;难度："
-				+item.subjectLevel_id+"&nbsp;&nbsp;上传人："
-				+item.user+"&nbsp;&nbsp;来源："
-				+null+"&nbsp;&nbsp;上传时间:"
-				+item.uploadTime+"&nbsp;&nbsp;组卷次数：<em>0</em>");
+					+item.id+"&nbsp;&nbsp;题型："
+					+item.subjectType_id+"&nbsp;&nbsp;难度："
+					+item.subjectLevel_id+"&nbsp;&nbsp;上传人："
+					+item.user+"&nbsp;&nbsp;来源："
+					+null+"&nbsp;&nbsp;上传时间:"
+					+item.uploadTime+"&nbsp;&nbsp;组卷次数：<em>0</em>");
 			//处理Catalogcontent中的内容，显示题干信息，显示在Catalogcontentup	
 				div.find(".Catalogcontentup").append(item.stem);
+				
+				switch(item.subjectType_id){//追加答案
+				//单选题
+					case 1:
+						$.post('exam/manager/getSubjectChoice',{'id':item.id},function(data){
+							// console.log("22",data);
+							div.find('.Catalogcontentup').append($('<div class="outer"></div>'));
+							data.forEach(function(item,index){
+								var arr = ['A','B','C','D'];
+								var opt = $('<span>&nbsp;&nbsp;'
+									+arr[index]+':&nbsp;&nbsp;'
+									+item.content+'</span><br>');
+								div.find('.Catalogcontentup .outer').append(opt);
+								if(item.correct['data'][0]){
+									opt.css('color','red')
+								}
+							})
+						})
+					break;
+					case 2:
+						$.post('exam/manager/getSubjectChoice',{'id':item.id},function(data){
+							div.find('.Catalogcontentup').append($('<div class="outer"></div>'));
+							data.forEach(function(item,index){
+								var arr = ['A','B','C','D','E','F','G','H'];
+								var opt = $('<span>&nbsp;&nbsp;'
+									+arr[index]+':&nbsp;&nbsp;'
+									+item.content+'</span><br>');
+								div.find('.Catalogcontentup .outer').append(opt);
+								if(item.correct['data'][0]){
+									opt.css('color','red')
+								}
+							})
+						})
+					break;
+					case 3:
+						//item为每一道题　
+						div.find('.Catalogcontentup').append('<div class="append" hidden>答案是：'+item.answer+'<br>解析是:'+item.analysis+'</div>');
+					break;
+				}
 				$('.Catalogcontentdown').html('<a href="javascript:void(0)" id="'+item.id+'">审核通过</a>'
 										+'<a href="javascript:void(0)" id="'+item.id+'">审核不通过</a>'
 										+'<a href="javascript:void(0)" id="'+item.id+'">删除</a>');
-				switch(item.subjectType_id){
-				//单选题
-					case 1:
-					//从后台根据id拿到数据　
-					$.post('exam/manager/getSubjectChoice',{'id':item.id},function(data){
-						console.log('哈哈',data);
-						//把数据放到一个div里面
-						$('.Catalogcontentup').append($('<div class="outer"></div>'));
-						//遍历拿到的数据
-						data.forEach(function(item){
-							//console.log(item.content);
-							console.log(item.id);
-							var arr = ['0','A','B','C','D'];
-							//显示数据的格式
-							var opt = $('<span>&nbsp;&nbsp;'
-								+arr[item.id]+':&nbsp;&nbsp;'+item.content+'</span><br>');
-							$('.Catalogcontentup .outer').append(opt);
-							//把正确的答案变成红色
-							if(item.correct['data'][0]){
-								console.log("3",item.correct['data'][0])
-								opt.css('color','red');
-							}
-						})
-					})
-					case 2:
-					alert(1);
-					break;
-					case 3:
-					alert('简答题');
-					break;
-				}
-				$('.Catalogcontentup').append('<div class="append" hidden>答案和解析如下:<br><em class="ml15">'+item.analysis+'</em></br><em class="ml15">'+item.answer+'</em></div>');
+				$(".Catalog_right").append(div);				
 			})
-
-
-				// 			//判断是单选多选还是简答
-				// 			switch(item.subjectType.id){
-				// 				//如果是单选题
-				// 				case 1://对每一个选项进行遍历
-				// 				//创建一个div 用于答案的隐藏和显示
-				// 				var div_2=$("<div class='append' style='display:none'></div>")
-				// 				item['choices'].forEach(function(item,index){
-				// 					//创建一个选项的div
-				// 					var div_1=$("<div></div>")
-				// 					//创建并单选的radio选型框
-				// 					var rad_1=$("<input type='radio' name="+item['id']+" id ="+item['id']+">");
-				// 					//创建并赋值选项
-				// 					var cho_1=$("<span  style='position:float ; margin-left:20px;margin-right:20px;' >"+item['content']+"</span>")
-				// 					//一一追加
-				// 					div_1.append(rad_1);
-				// 					div_1.append(cho_1);
-				// 					div.find(".Catalogcontentup").append(div_1);
-				// 					//console.log(item["correct"]+"*******")
-				// 					div.find(".Catalogcontentup").append(div_2);
-				// 					if(item.correct){
-				// 						var correct_1=$("<span style='color:red'>"+item['content']+"</span>")
-				// 						div_2.append(correct_1);
-										
-				// 						}									
-				// 					})
-				// 					//给每一个标签添加一个subject.id
-				// 					div.find("a").each(function(item,itemx){
-				// 						$(itemx).attr("id",item.id);
-				// 						})
-				// 				break;
-								
-				// 				case 2:
-				// 				//多选框
-				// 				//创建一个div 用于答案的隐藏和显示
-				// 				var div_2=$("<div class='append' style='display:none'></div>")
-				// 				item['choices'].forEach(function(item,index){
-				// 					//创建一个选项的div
-				// 					var div_1=$("<div></div>")
-				// 					//创建并单选的radio选型框
-				// 					var rad_1=$("<input type='checkbox' name="+item['id']+" id ="+item['id']+">");
-				// 					//创建并赋值选项
-				// 					var cho_1=$("<span  style='position:float ; margin-left:20px;margin-right:20px;' >"+item['content']+"</span>")
-				// 					//一一追加
-				// 					div_1.append(rad_1);
-				// 					div_1.append(cho_1);
-				// 					div.find(".Catalogcontentup").append(div_1);
-				// 					//console.log(item["correct"]+"*******")
-				// 					div.find(".Catalogcontentup").append(div_2);
-				// 					if(item.correct){
-				// 						var correct_1=$("<span style='color:red'>"+item['content']+"</span>")
-				// 						div_2.append(correct_1);
-										
-				// 						}									
-				// 					})
-				// 					//给每一个标签添加一个subject.id
-				// 					div.find("a").each(function(item,itemx){
-				// 						$(itemx).attr("id",item.id);
-				// 						})
-								
-				// 				break;
-				// 				case 3:
-				// 				break;		
-				// 		}
-				// })
 		 }
 </script>   

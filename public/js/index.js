@@ -11,7 +11,7 @@
     });
 	
 	$(".baseUI li ul li:eq(0)").click(function(){
-		$(".right").load("pages/显示题目.html");//显示题目
+		$(".right").load("pages/showSubject.html");//显示题目
 		})
 	$(".baseUI li ul:eq(0) li:eq(0)").trigger('click');
   

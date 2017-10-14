@@ -48,6 +48,9 @@ route.get('/getDepartmentTopics',(req,resp)=>{
 route.post('/saveSubject',(req,resp)=>{
     console.log(req.body);
     DB.saveSubject(req.body).then((data)=>{
+        if(req.body['subjectType.id']!=3){
+            DB.saveChoice(req.body,data['insertId']);
+        }
         resp.send(data);
     }).catch((err)=>{
         resp.send(err);
@@ -63,13 +66,13 @@ route.post('/getAllSubjects',(req,resp)=>{
 })
 //8通过id删除题目
 route.post('/delSubject',(req,resp)=>{
-    var ids =[];
-    ids = ids.concat(req.body['ids[]']);
-    DB.delSubject(ids).then((data)=>{
+    DB.delSubject(req.body).then((data)=>{
+        console.log("嘻嘻",req.body)
         resp.send(data);
     }).catch((err)=>{
         resp.send(err);
     })
+    
 })
 //9审核题目
 route.post('/checkSubject',(req,resp)=>{

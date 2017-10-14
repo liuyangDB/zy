@@ -50,8 +50,18 @@ module.exports={
         console.log("哈哈",sql)
         return pool.execute(sql);
     },
+    saveChoice(subject,id){
+        for(var key in subject['choiceContent[]']){
+            let sql = "insert into tbl_exam_choice values(null,'"
+            +subject['choiceContent[]'][key]+"',"
+            +subject['choiceCorrect[]'][key]+","
+            +id+")";
+            pool.execute(sql);
+        }
+    },
     //７查询所有题目信息
     getAllSubjects(subject){
+        console.log("嘿嘿",subject);
         let type_id = JSON.parse(subject["type"]);
         let level_id = JSON.parse(subject["level"]);
         let direct_id = JSON.parse(subject["direct"]);
@@ -65,6 +75,7 @@ module.exports={
     },
     //８通过id删除题目
     delSubject(subject){
+        console.log("22",subject);
         let id =subject['subject.id'];
         let sql = "delete from tbl_exam_subject where id ="+id;
         return pool.execute(sql);        

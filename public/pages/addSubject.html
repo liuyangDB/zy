@@ -128,7 +128,7 @@
 			
 			//点击右上角×号，返回第一个页面
 			$(".deletetitle").click(function(){
-				$(".right").load("pages/显示题目.html");
+				$(".right").load("pages/showSubject.html");
 			})
 			//获取类型数据
 			$.getJSON("exam/manager/getAllSubjectType",function(data){
@@ -167,16 +167,29 @@
 				$("select:eq(1)").children("option").eq(1).trigger("click");
 				$("select:eq(1)").children("option").eq(1).attr("selected","selected");
 			})
+			//添加选项框
+			$('.c_condition .icon_add').on('click',function(){
+				var div = $('.Answerpart:last').clone();
+				div.find(':input').val('');
+				div.find('input:checked').prop('checked',false);
+				var opt =div.find('.Answerpart_left p').text();
+				opt =String.fromCharCode(opt.charCodeAt(0)+1);
+				div.find('.Answerpart_left p').text(opt);
+				$('.Answercontent').append(div);
+			})
 			//保存并继续
+			$('.btn_left .btnL:first').off();
 			$('.btn_left .btnL:first').on('click',function(){
 				saveSubject();
-				$('input').val('');
-				$('input:checked').prop('checked',false);
+				$(".right").load("pages/addSubject.html");
+				// $('input').val('');
+				// $('input:checked').prop('checked',false);
 			})
 			//保存并关闭
+			$('.btn_left .btnL:last').off();
 			$('.btn_left .btnL:last').on('click',function(){
 				saveSubject();
-				$(".right").load("pages/显示题目.html");
+				$(".right").load("pages/showSubject.html");
 			})
 			$('.Attributecontent_left').change(function(){
 				switch($('option:selected').val()){
@@ -207,10 +220,10 @@
 			var subjectLevel_id = $('select[name="level"]').find('option:selected').val();
 			var department_id = $('select[name="type"]').find('option:selected').val();
 			var topic_id = $('select[name="topic"]').find('option:selected').val();
-			var choiceA = $('.Answerpart:eq(0) .Answerpart_right').val();
-			var choiceB = $('.Answerpart:eq(1) .Answerpart_right').val();
-			var choiceC = $('.Answerpart:eq(2) .Answerpart_right').val();
-			var choiceD = $('.Answerpart:eq(3) .Answerpart_right').val();
+			var choiceA = $('.Answerpart:eq(0) textarea').val();
+			var choiceB = $('.Answerpart:eq(1) textarea').val();
+			var choiceC = $('.Answerpart:eq(2) textarea').val();
+			var choiceD = $('.Answerpart:eq(3) textarea').val();
 			var choiceCorrect_ids = $('.Answerpart input').toArray().map(function(item){
 				if($(item).is(':checked')){
 					return 1;
